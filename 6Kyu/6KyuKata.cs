@@ -212,11 +212,11 @@ static int DigitalRoot(long n)
         n = sum;
         num = sum.ToString().Length;
     }
-    while (num > 1) ;
+    while (num > 1);
     return Convert.ToInt32(sum);
 }
 
-/*10.
+/*10. Does my number look big in this?
  * A Narcissistic Number is a positive number which is the sum of its own digits, each raised to the power of the number of digits in a given base.
  * In this Kata, we will restrict ourselves to decimal (base 10). For example, take 153 (3 digits), which is narcisstic:
  * 1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153    and 1652 (4 digits), which isn't:   1^4 + 6^4 + 5^4 + 2^4 = 1 + 1296 + 625 + 16 = 1938
@@ -236,4 +236,151 @@ static bool Narcissistic(int value)
     }
     return (int)((double)sum) == value;
 }
-Console.WriteLine(Narcissistic(153));
+
+/*11. Take a Ten Minutes Walk
+ * You live in the city of Cartesia where all roads are laid out in a perfect grid. You arrived ten minutes too early to an appointment,
+ * so you decided to take the opportunity to go for a short walk. The city provides its citizens with a Walk Generating App on their phones
+ * -- everytime you press the button it sends you an array of one-letter strings representing directions to walk (eg. ['n', 's', 'w', 'e']). 
+ * You always walk only a single block for each letter (direction) and you know it takes you one minute to traverse one city block,
+ * so create a function that will return true if the walk the app gives you will take you exactly ten minutes (you don't want to be early or late!)
+ * and will, of course, return you to your starting point. Return false otherwise.
+ * Note: you will always receive a valid array containing a random assortment of direction letters ('n', 's', 'e', or 'w' only).
+ * It will never give you an empty array (that's not a walk, that's standing still!)
+ */
+static bool IsValidWalk(string[] walk)
+{
+    if (walk.Length != 10)
+    {
+        return false;
+    }
+    else
+    {
+        Dictionary<string, int> directions = new Dictionary<string, int>()
+        { {"n", 0}, {"s", 0}, {"e", 0}, {"w", 0},};
+        foreach (string s in walk)
+        {
+            directions[s]++;
+        }
+        return directions["n"] == directions["s"] && directions["w"] == directions["e"];
+    }
+}
+
+/*12. The Supermarket Queue
+ * There is a queue for the self-checkout tills at the supermarket. Your task is write a function to calculate the total time required for all the customers to check out!
+ * input  customers: an array of positive integers representing the queue. Each integer represents a customer,
+ * and its value is the amount of time they require to check out.     n: a positive integer, the number of checkout tills.
+ * output    The function should return an integer, the total time required.
+ * Important    Please look at the examples and clarifications below, to ensure you understand the task correctly :)
+ * Examples   queueTime([5,3,4], 1) // should return 12 // because when there is 1 till, the total time is just the sum of the times
+ * queueTime([10,2,3,3], 2) // should return 10 // because here n=2 and the 2nd, 3rd, and 4th people in the  // queue finish before the 1st person has finished.
+ * queueTime([2,3,10], 2) // should return 12 Clarifications  There is only ONE queue serving many tills, and The order of the queue NEVER changes, and
+ * The front person in the queue (i.e. the first element in the array/list) proceeds to a till as soon as it becomes free.
+ * N.B. You should assume that all the test input will be valid, as specified above.
+ * P.S. The situation in this kata can be likened to the more-computer-science-related idea of a thread pool, with relation to running multiple processes at the same time: https://en.wikipedia.org/wiki/Thread_pool
+ */
+static long QueueTime(int[] customers, int n)
+{
+    int[] tills = new int[n];
+    foreach (int i in customers)
+    {
+        tills[Array.IndexOf(tills, tills.Min())] += i;
+    }
+    return tills.Max();
+}
+
+/*13. Find the odd int
+ * Given an array of integers, find the one that appears an odd number of times.
+ * There will always be only one integer that appears an odd number of times.
+ * Examples    [7] should return 7, because it occurs 1 time (which is odd). [0] should return 0, because it occurs 1 time (which is odd).
+ * [1,1,2] should return 2, because it occurs 1 time (which is odd). [0,1,0,1,0] should return 0, because it occurs 3 times (which is odd).
+ * [1,2,2,3,3,3,4,3,3,3,2,2,1] should return 4, because it appears 1 time (which is odd).
+ */
+static int find_it(int[] seq)
+{
+    return Array.Find(seq, x => seq.Count(y => y == x) % 2 != 0);
+}
+
+/*14.  Highest Scoring Word
+ * Given a string of words, you need to find the highest scoring word.
+ * Each letter of a word scores points according to its position in the alphabet: a = 1, b = 2, c = 3 etc.
+ * You need to return the highest scoring word as a string.
+ * If two words score the same, return the word that appears earliest in the original string.
+ * All letters will be lowercase and all inputs will be valid.
+ */
+static string High(string s)
+{
+    string[] str = s.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+    int max = 0;
+    foreach (string word in str)
+    {
+        int score = word.Sum(x => char.ToUpper(x) - 64);
+        if (score > max)
+        {
+            max = score;
+            s = word;
+        }
+    }
+    return s;
+}
+
+/*15. Find The Parity Outlier
+ * You are given an array (which will have a length of at least 3, but could be very large) containing integers.
+ * The array is either entirely comprised of odd integers or entirely comprised of even integers except for a single integer N.
+ * Write a method that takes the array as an argument and returns this "outlier" N.
+ * Examples  [2, 4, 0, 100, 4, 11, 2602, 36] Should return: 11 (the only odd number)
+ * [160, 3, 1719, 19, 11, 13, -21] Should return: 160 (the only even number)
+ */
+static int Find(int[] integers)
+{
+    int[] nums = new int[integers.Length];
+    integers.CopyTo(nums, 0);
+    for (int i = 0; i < nums.Length; i++)
+    {
+        nums[i] %= 2;
+    }
+    int outlier = 0;
+    foreach (int i in nums)
+    {
+        if (Array.IndexOf(nums, i) == Array.LastIndexOf(nums, i))
+        {
+            outlier = Array.IndexOf(nums, i);
+        }
+    }
+    return integers[outlier];
+}
+
+/*16. Split Strings
+ * Complete the solution so that it splits the string into pairs of two characters. 
+ * If the string contains an odd number of characters then it should replace the missing second character of the final pair with an underscore ('_').
+ * Examples:  * 'abc' =>  ['ab', 'c_']     * 'abcdef' => ['ab', 'cd', 'ef']
+ */
+static string[] Solution2(string str)
+{
+    if (str.Length % 2 != 0)
+    {
+        str += "_";
+    }
+    string[] pairs = new string[str.Length / 2];
+    for (int i = 0; i < str.Length; i += 2)
+    {
+        pairs[i / 2] = str.Substring(i, 2);
+    }
+    return pairs;
+}
+
+/*17. Duplicate Encoder
+ * The goal of this exercise is to convert a string to a new string where each character in the new string
+ * is "(" if that character appears only once in the original string, or ")" if that character appears more than once in the original string. 
+ * Ignore capitalization when determining if a character is a duplicate.
+ * Examples  "din"  =>  "((("     "recede"   =>  "()()()"      "Success"  =>  ")())())"          "(( @"   =>  "))((" 
+ */
+static string DuplicateEncode(string word)
+{
+    word = word.ToLower();
+    string result = "";
+    foreach (char c in word)
+    {
+        result = word.IndexOf(c) == word.LastIndexOf(c) ? result + "(" : result + ")";
+    }
+    return result;
+}
